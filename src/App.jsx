@@ -10,6 +10,8 @@ import {
   Drawer,
   IconButton,
   Badge,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   ShoppingCart as CartIcon,
@@ -17,6 +19,13 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
   Remove as RemoveIcon,
+  FilterList as FilterIcon,
+  Inventory as InventoryIcon,
+  TrendingUp,
+  People,
+  LocalShipping,
+  AttachMoney,
+  Star,
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EcommerceProvider, useEcommerce } from './context/EcommerceContext';
@@ -27,14 +36,6 @@ import ProductCard from './components/ProductCard';
 import StatsCard from './components/StatsCard';
 import FilterSidebar from './components/FilterSidebar';
 import SalesChart from './components/SalesChart';
-import {
-  TrendingUp,
-  People,
-  Inventory,
-  AttachMoney,
-  LocalShipping,
-  Star,
-} from '@mui/icons-material';
 import toast from 'react-hot-toast';
 
 // Cart Drawer Component
@@ -235,8 +236,12 @@ const DashboardContent = () => {
     brands,
   } = useEcommerce();
 
+  const themeMui = useTheme();
+  const isMobile = useMediaQuery(themeMui.breakpoints.down('md'));
+  const [isSidebarMinimized, setIsSidebarMinimized] = useState(false);
   const [filterOpen, setFilterOpen] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   const statsCards = [
     {
@@ -277,6 +282,11 @@ const DashboardContent = () => {
     },
   ];
 
+  // Toggle sidebar minimized state
+  const handleToggleSidebar = () => {
+    setIsSidebarMinimized(!isSidebarMinimized);
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       <Header
@@ -284,6 +294,7 @@ const DashboardContent = () => {
         toggleTheme={toggleTheme}
         isDarkMode={isDarkMode}
         onCartClick={() => setCartOpen(true)}
+        onFilterClick={() => setMobileFilterOpen(true)}
       />
 
       <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -303,31 +314,37 @@ const DashboardContent = () => {
         </motion.div>
 
         <Grid container spacing={3}>
-          {/* Filters Sidebar */}
-          <Grid item xs={12} lg={3}>
-            <FilterSidebar
-              open={filterOpen}
-              onClose={() => setFilterOpen(false)}
-              filters={filters}
-              onFilterChange={updateFilters}
-              categories={categories}
-              brands={brands}
-            />
-            {!filterOpen && (
-              <Button
-                fullWidth
-                variant="outlined"
-                startIcon={<TrendingUp />}
-                onClick={() => setFilterOpen(true)}
-                sx={{ mb: 3 }}
-              >
-                Show Filters
-              </Button>
-            )}
-          </Grid>
+          {/* Filters Sidebar - Desktop */}
+          {!isMobile && (
+            <Grid item xs={12} lg={isSidebarMinimized ? 1 : 3}>
+              {filterOpen ? (
+                <FilterSidebar
+                  open={filterOpen}
+                  onClose={() => setFilterOpen(false)}
+                  filters={filters}
+                  onFilterChange={updateFilters}
+                  categories={categories}
+                  brands={brands}
+                  isMinimized={isSidebarMinimized}
+                  onToggleMinimize={handleToggleSidebar}
+                />
+              ) : (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FilterIcon />}
+                    onClick={() => setFilterOpen(true)}
+                    sx={{ borderRadius: 3 }}
+                  >
+                    Show Filters
+                  </Button>
+                </Box>
+              )}
+            </Grid>
+          )}
 
           {/* Main Content */}
-          <Grid item xs={12} lg={9}>
+          <Grid item xs={12} lg={isSidebarMinimized && !isMobile ? 11 : !isMobile ? 9 : 12}>
             {/* Sales Chart */}
             <Box sx={{ mb: 4 }}>
               <SalesChart />
@@ -343,7 +360,57 @@ const DashboardContent = () => {
                   {products.length} products found
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              
+              {/* Mobile Filter Button */}
+              {isMobile && (
+                <Button
+                  variant="outlined"
+                  startIcon={<FilterIcon />}
+                  onClick={() => setMobileFilterOpen(true)}
+                  size="small"
+                >
+                  Filters
+                </Button>
+              )}
+              
+              {/* Desktop Sort Buttons */}
+              {!isMobile && (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button
+                    variant={filters.sortBy === 'featured' ? 'contained' : 'outlined'}
+                    onClick={() => updateFilters({ sortBy: 'featured' })}
+                    size="small"
+                  >
+                    Featured
+                  </Button>
+                  <Button
+                    variant={filters.sortBy === 'newest' ? 'contained' : 'outlined'}
+                    onClick={() => updateFilters({ sortBy: 'newest' })}
+                    size="small"
+                  >
+                    Newest
+                  </Button>
+                  <Button
+                    variant={filters.sortBy === 'price-low' ? 'contained' : 'outlined'}
+                    onClick={() => updateFilters({ sortBy: 'price-low' })}
+                    size="small"
+                  >
+                    Price: Low to High
+                  </Button>
+                  <Button
+                    variant={filters.sortBy === 'rating' ? 'contained' : 'outlined'}
+                    onClick={() => updateFilters({ sortBy: 'rating' })}
+                    size="small"
+                  >
+                    Top Rated
+                  </Button>
+                </Box>
+              )}
+            </Box>
+
+            {/* Mobile Sort Buttons */}
+            {isMobile && (
+              <Box sx={{ display: 'flex', gap: 1, mb: 3, overflowX: 'auto' }}>
                 <Button
                   variant={filters.sortBy === 'featured' ? 'contained' : 'outlined'}
                   onClick={() => updateFilters({ sortBy: 'featured' })}
@@ -363,7 +430,7 @@ const DashboardContent = () => {
                   onClick={() => updateFilters({ sortBy: 'price-low' })}
                   size="small"
                 >
-                  Price: Low to High
+                  Price: Low
                 </Button>
                 <Button
                   variant={filters.sortBy === 'rating' ? 'contained' : 'outlined'}
@@ -373,7 +440,7 @@ const DashboardContent = () => {
                   Top Rated
                 </Button>
               </Box>
-            </Box>
+            )}
 
             {/* Products Grid */}
             <Grid container spacing={3}>
@@ -392,7 +459,7 @@ const DashboardContent = () => {
 
             {products.length === 0 && (
               <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Inventory sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
+                <InventoryIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
                 <Typography variant="h6" color="text.secondary" gutterBottom>
                   No products found
                 </Typography>
@@ -407,6 +474,33 @@ const DashboardContent = () => {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Mobile Filter Drawer */}
+      <Drawer
+        anchor="left"
+        open={mobileFilterOpen}
+        onClose={() => setMobileFilterOpen(false)}
+        ModalProps={{
+          keepMounted: true,
+        }}
+        PaperProps={{
+          sx: {
+            width: { xs: '100%', sm: 320 },
+            borderRadius: '0 16px 16px 0',
+          },
+        }}
+      >
+        <FilterSidebar
+          open={mobileFilterOpen}
+          onClose={() => setMobileFilterOpen(false)}
+          filters={filters}
+          onFilterChange={updateFilters}
+          categories={categories}
+          brands={brands}
+          isMinimized={false}
+          onToggleMinimize={() => {}}
+        />
+      </Drawer>
 
       {/* Cart Drawer */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />

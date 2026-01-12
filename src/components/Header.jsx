@@ -18,6 +18,8 @@ import {
   ListItemText,
   Divider,
   Switch,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -34,14 +36,19 @@ import {
   Settings as SettingsIcon,
   Logout as LogoutIcon,
   LocalShipping as ShippingIcon,
+  FilterList as FilterIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
+const Header = ({ cartCount, toggleTheme, isDarkMode, onCartClick, onFilterClick }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationsAnchor, setNotificationsAnchor] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -53,6 +60,15 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      console.log('Searching for:', searchQuery);
+      // Implement search functionality here
+      setSearchQuery('');
+    }
   };
 
   const notifications = [
@@ -79,9 +95,9 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
           boxShadow: '0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06)',
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
           {/* Left Side: Logo & Menu */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 3 } }}>
             <IconButton
               color="inherit"
               onClick={toggleDrawer}
@@ -90,12 +106,23 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
               <MenuIcon />
             </IconButton>
 
+            {/* Mobile Filter Button */}
+            {isMobile && (
+              <IconButton
+                color="inherit"
+                onClick={onFilterClick}
+                sx={{ display: { xs: 'flex', md: 'none' } }}
+              >
+                <FilterIcon />
+              </IconButton>
+            )}
+
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               >
-                <StoreIcon sx={{ fontSize: 32 }} />
+                <StoreIcon sx={{ fontSize: { xs: 24, md: 32 } }} />
               </motion.div>
               <Typography
                 variant="h5"
@@ -132,61 +159,69 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
           </Box>
 
           {/* Center: Search Bar */}
-          <Box
-            sx={{
-              display: { xs: 'none', md: 'flex' },
-              flex: 1,
-              maxWidth: 500,
-              mx: 4,
-              position: 'relative',
-            }}
-          >
-            <SearchIcon
+          {!isMobile && (
+            <Box
               sx={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'text.secondary',
+                flex: 1,
+                maxWidth: 500,
+                mx: 4,
+                position: 'relative',
               }}
-            />
-            <InputBase
-              placeholder="Search products, brands, categories..."
-              sx={{
-                width: '100%',
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                borderRadius: 12,
-                px: 4,
-                py: 0.75,
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                },
-                '& .MuiInputBase-input': {
-                  color: 'white',
-                  '&::placeholder': {
+            >
+              <form onSubmit={handleSearch}>
+                <SearchIcon
+                  sx={{
+                    position: 'absolute',
+                    left: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
                     color: 'rgba(255, 255, 255, 0.7)',
-                  },
-                },
-              }}
-            />
-          </Box>
+                  }}
+                />
+                <InputBase
+                  placeholder="Search products, brands, categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  sx={{
+                    width: '100%',
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    borderRadius: 12,
+                    px: 4,
+                    py: 0.75,
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    },
+                    '& .MuiInputBase-input': {
+                      color: 'white',
+                      '&::placeholder': {
+                        color: 'rgba(255, 255, 255, 0.7)',
+                      },
+                    },
+                  }}
+                />
+              </form>
+            </Box>
+          )}
 
           {/* Right Side: Action Icons */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 } }}>
             {/* Theme Toggle */}
-            <IconButton onClick={toggleTheme} color="inherit">
+            <IconButton onClick={toggleTheme} color="inherit" size={isMobile ? "small" : "medium"}>
               {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
 
             {/* Search Mobile */}
-            <IconButton color="inherit" sx={{ display: { md: 'none' } }}>
-              <SearchIcon />
-            </IconButton>
+            {isMobile && (
+              <IconButton color="inherit" size="small">
+                <SearchIcon />
+              </IconButton>
+            )}
 
             {/* Notifications */}
             <IconButton
               color="inherit"
               onClick={(e) => setNotificationsAnchor(e.currentTarget)}
+              size={isMobile ? "small" : "medium"}
             >
               <Badge badgeContent={notifications.length} color="error">
                 <NotificationsIcon />
@@ -222,25 +257,29 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
             </Menu>
 
             {/* Wishlist */}
-            <IconButton color="inherit">
+            <IconButton color="inherit" size={isMobile ? "small" : "medium"}>
               <Badge badgeContent={3} color="error">
                 <FavoriteIcon />
               </Badge>
             </IconButton>
 
             {/* Cart */}
-            <IconButton color="inherit" component={Link} to="/cart">
+            <IconButton 
+              color="inherit" 
+              onClick={onCartClick}
+              size={isMobile ? "small" : "medium"}
+            >
               <Badge badgeContent={cartCount} color="error">
                 <CartIcon />
               </Badge>
             </IconButton>
 
             {/* User Menu */}
-            <IconButton onClick={handleMenuOpen}>
+            <IconButton onClick={handleMenuOpen} size={isMobile ? "small" : "medium"}>
               <Avatar
                 sx={{
-                  width: 36,
-                  height: 36,
+                  width: isMobile ? 32 : 36,
+                  height: isMobile ? 32 : 36,
                   backgroundColor: 'rgba(255, 255, 255, 0.2)',
                 }}
               >
@@ -305,14 +344,47 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
           },
         }}
       >
-        <Box sx={{ p: 2 }}>
+        <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
             <StoreIcon sx={{ fontSize: 32, color: 'primary.main' }} />
             <Typography variant="h6" fontWeight={800}>
               ShopHub
             </Typography>
           </Box>
-          <List>
+          
+          {/* Mobile Search */}
+          <Box sx={{ mb: 3 }}>
+            <form onSubmit={handleSearch}>
+              <Box sx={{ position: 'relative' }}>
+                <SearchIcon
+                  sx={{
+                    position: 'absolute',
+                    left: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'text.secondary',
+                  }}
+                />
+                <InputBase
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  sx={{
+                    width: '100%',
+                    backgroundColor: 'action.hover',
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1,
+                    '& .MuiInputBase-input': {
+                      fontSize: '0.875rem',
+                    },
+                  }}
+                />
+              </Box>
+            </form>
+          </Box>
+
+          <List sx={{ flex: 1 }}>
             {menuItems.map((item) => (
               <ListItem
                 key={item.text}
@@ -335,7 +407,9 @@ const Header = ({ cartCount, toggleTheme, isDarkMode }) => {
               </ListItem>
             ))}
           </List>
+          
           <Divider sx={{ my: 2 }} />
+          
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle2" color="text.secondary" gutterBottom>
               Theme
