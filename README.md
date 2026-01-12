@@ -1,16 +1,52 @@
-# React + Vite
+# 🛍️ E-commerce Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, fully-featured e-commerce dashboard built with React and Material-UI. Features product management, shopping cart, user authentication, and sales analytics.
 
-Currently, two official plugins are available:
+![E-commerce Dashboard Preview](https://via.placeholder.com/800x400.png?text=E-commerce+Dashboard+Screenshot)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+### 🎯 **Core Features**
+- **Product Catalog** - Browse products with images, prices, and ratings
+- **Smart Filtering** - Filter by category, price, rating, brands, and features
+- **Shopping Cart** - Add/remove items, update quantities, calculate totals
+- **Wishlist** - Save favorite products for later
+- **User Authentication** - Mock user system with profiles
+- **Order Management** - Track order history and status
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 📊 **Analytics Dashboard**
+- **Sales Charts** - Interactive charts with Recharts
+- **Stats Overview** - Key metrics with progress indicators
+- **Real-time Updates** - Live cart and wishlist updates
+- **Dark/Light Mode** - Toggle between themes
 
-## Expanding the ESLint configuration
+### 🎨 **UI/UX Features**
+- **Responsive Design** - Mobile-first approach
+- **Smooth Animations** - Framer Motion animations
+- **Modern Components** - Material-UI with custom styling
+- **Notifications** - Toast notifications for actions
+- **Glass Morphism** - Modern design effects
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Technologies Used
+
+- **React 18** - Frontend library
+- **Vite** - Build tool & dev server
+- **Material-UI** - Component library
+- **Framer Motion** - Animations
+- **Recharts** - Charting library
+- **React Router** - Navigation
+- **React Hot Toast** - Notifications
+- **date-fns** - Date utilities
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ecommerce-dashboard.git
+   cd ecommerce-dashboard
